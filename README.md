@@ -1,6 +1,6 @@
 ## Serviço de Gerenciamento de Pedidos (Order Service)
 
-Microsserviço em Go para gerenciamento de pedidos de e-commerce, seguindo arquitetura hexagonal, com MongoDB, RabbitMQ, Gin, Zap, Cleanenv, testes (unitários, integração e end-to-end), documentação Swagger e stack dockerizada.
+Microsserviço em Go para gerenciamento de pedidos de e-commerce, seguindo arquitetura hexagonal, com MongoDB, RabbitMQ, Gin, testes (unitários, integração e end-to-end), documentação Swagger.
 
 ![Modelagem do banco](Modelagem%20do%20banco.drawio.png)
 
