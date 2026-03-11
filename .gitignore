@@ -1,0 +1,17 @@
+bin/
+dist/
+coverage/
+coverage.*
+*.log
+
+.env
+.env.*
+!.env.example
+
+.DS_Store
+
+.cursor/
+PRD.md
+
+__debug_bin
+
