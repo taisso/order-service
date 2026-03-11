@@ -1,0 +1,197 @@
+basePath: /
+definitions:
+  dto.CreateOrderItem:
+    properties:
+      product_id:
+        type: string
+      product_name:
+        type: string
+      quantity:
+        type: integer
+      unit_price:
+        minimum: 0
+        type: number
+    required:
+    - product_id
+    - product_name
+    - quantity
+    - unit_price
+    type: object
+  dto.CreateOrderRequest:
+    properties:
+      customer_id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/dto.CreateOrderItem'
+        minItems: 1
+        type: array
+    required:
+    - customer_id
+    - items
+    type: object
+  dto.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  dto.HealthResponse:
+    properties:
+      status:
+        type: string
+      timestamp:
+        type: string
+    type: object
+  dto.OrderItemResponse:
+    properties:
+      product_id:
+        type: string
+      product_name:
+        type: string
+      quantity:
+        type: integer
+      unit_price:
+        type: number
+    type: object
+  dto.OrderResponse:
+    properties:
+      created_at:
+        type: string
+      customer_id:
+        type: string
+      id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/dto.OrderItemResponse'
+        type: array
+      status:
+        type: string
+      total_price:
+        type: number
+      updated_at:
+        type: string
+    type: object
+  dto.UpdateStatusRequest:
+    properties:
+      status:
+        type: string
+    required:
+    - status
+    type: object
+info:
+  contact: {}
+  description: Serviço de gerenciamento de pedidos de e-commerce.
+  title: Order Service API
+  version: "1.0"
+paths:
+  /health:
+    get:
+      description: Verifica se o serviço está saudável (inclui ping ao MongoDB)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HealthResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/dto.HealthResponse'
+      summary: Healthcheck
+      tags:
+      - health
+  /orders:
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo pedido
+      parameters:
+      - description: Pedido
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.OrderResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Criar pedido
+      tags:
+      - orders
+  /orders/{id}:
+    get:
+      description: Retorna um pedido pelo ID
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.OrderResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Obter pedido
+      tags:
+      - orders
+  /orders/{id}/status:
+    patch:
+      consumes:
+      - application/json
+      description: Atualiza o status de um pedido
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Novo status
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.OrderResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Atualizar status do pedido
+      tags:
+      - orders
+swagger: "2.0"
