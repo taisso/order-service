@@ -26,7 +26,7 @@ type Config struct {
 		RoutingKey string `env:"RABBITMQ_ROUTING_KEY" env-required:"true"`
 	}
 	Logger struct {
-		Level string `env:"LOGGER_LEVEL" env-default:"info"`
+		Level string `env:"LOGGER_LEVEL" env-default:"debug"`
 	}
 }
 

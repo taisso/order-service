@@ -61,7 +61,7 @@ As configurações são carregadas via `cleanenv` a partir do arquivo `.env`.
 | `RABBITMQ_EXCHANGE`     | Não        | `orders`     | Nome do exchange para eventos de pedido|
 | `RABBITMQ_QUEUE`        | **Sim**    | —            | Nome da fila de eventos de status     |
 | `RABBITMQ_ROUTING_KEY`  | **Sim**    | —            | Routing key para eventos de status    |
-| `LOGGER_LEVEL`          | Não        | `info`       | Nível de log (`debug`, `info`, etc.)  |
+| `LOGGER_LEVEL`          | Não        | `debug`      | Nível de log (`debug`, `info`, etc.)  |
 
 ### Comandos principais (Makefile)
 
