@@ -1,0 +1,75 @@
+@baseUrl = http://localhost:8080
+@orderId = 69b1e55f234bff11e77b10df
+
+### Healthcheck
+GET {{baseUrl}}/health
+Content-Type: application/json
+###
+
+### Criar pedido
+POST {{baseUrl}}/orders
+Content-Type: application/json
+
+{
+  "customer_id": "customer-42",
+  "items": [
+    {
+      "product_id": "prod-01",
+      "product_name": "Tênis Runner X",
+      "quantity": 2,
+      "unit_price": 199.90
+    },
+    {
+      "product_id": "prod-02",
+      "product_name": "Camiseta Runner X",
+      "quantity": 1,
+      "unit_price": 59.90
+    }
+  ]
+}
+
+###
+
+### Buscar pedido por ID
+# Copie o campo "id" da resposta do POST acima
+# e substitua REPLACE_WITH_ORDER_ID na variável @orderId no topo.
+GET {{baseUrl}}/orders/{{orderId}}
+Accept: application/json
+
+###
+
+### Atualizar status do pedido para criado
+PATCH {{baseUrl}}/orders/{{orderId}}/status
+Content-Type: application/json
+
+{
+  "status": "criado"
+}
+
+### Atualizar status do pedido para em_processamento
+PATCH {{baseUrl}}/orders/{{orderId}}/status
+Content-Type: application/json
+
+{
+  "status": "em_processamento"
+}
+
+###
+
+### Atualizar status do pedido para enviado
+PATCH {{baseUrl}}/orders/{{orderId}}/status
+Content-Type: application/json
+
+{
+  "status": "enviado"
+}
+
+###
+
+### Atualizar status do pedido para entregue
+PATCH {{baseUrl}}/orders/{{orderId}}/status
+Content-Type: application/json
+
+{
+  "status": "entregue"
+}
