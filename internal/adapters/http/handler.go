@@ -22,7 +22,7 @@ func NewHandler(service ports.Service, db mongoclient.Client) *Handler {
 }
 
 // @Summary      Healthcheck
-// @Description  Verifica se o serviço está saudável (inclui ping ao MongoDB)
+// @Description  Verifica se o serviço está saudável
 // @Tags         health
 // @Produce      json
 // @Success      200  {object}  dto.HealthResponse
