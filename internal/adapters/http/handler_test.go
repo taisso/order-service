@@ -67,17 +67,16 @@ func TestHandler_Health(t *testing.T) {
 	handlerUnhealthy := NewHandler(svc, dbUnhealthy)
 	routerUnhealthy := NewRouter(handlerUnhealthy, logger)
 
-	w2 := httptest.NewRecorder()
-	req2 := httptest.NewRequest(http.MethodGet, "/health", nil)
+	w = httptest.NewRecorder()
+	req = httptest.NewRequest(http.MethodGet, "/health", nil)
 
-	routerUnhealthy.ServeHTTP(w2, req2)
+	routerUnhealthy.ServeHTTP(w, req)
 
-	assert.Equal(t, http.StatusServiceUnavailable, w2.Code)
+	assert.Equal(t, http.StatusServiceUnavailable, w.Code)
 
-	var resp2 dto.HealthResponse
-	err = json.Unmarshal(w2.Body.Bytes(), &resp2)
+	err = json.Unmarshal(w.Body.Bytes(), &resp)
 	assert.NoError(t, err)
-	assert.Equal(t, "unhealthy", resp2.Status)
+	assert.Equal(t, "unhealthy", resp.Status)
 }
 
 func TestHandler_CreateOrder_Success(t *testing.T) {
