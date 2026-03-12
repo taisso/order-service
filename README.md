@@ -127,7 +127,7 @@ go tool cover -func=coverage.out
   **Resultado da cobertura** (saída de `make coverage` — pacotes e resumo por função):
 
   - Pacotes considerados na cobertura: `internal/domain/...`, `internal/application/...`, `internal/adapters/http/...`, `internal/adapters/mongodb/...`, `internal/adapters/rabbitmq/...`.
-  - Exemplo de saída no terminal (resumo por função e total):
+  - Exemplo de saída atual no terminal (resumo por função e total, via `make coverage`):
 
 ```
 order-service/internal/adapters/http/dto/request.go:21:		ToDomainItems		100.0%
@@ -136,7 +136,7 @@ order-service/internal/adapters/http/handler.go:20:		NewHandler		100.0%
 order-service/internal/adapters/http/handler.go:31:		Health			100.0%
 order-service/internal/adapters/http/handler.go:55:		CreateOrder		100.0%
 order-service/internal/adapters/http/handler.go:82:		GetOrder		100.0%
-order-service/internal/adapters/http/handler.go:109:		UpdateOrderStatus	93.8%
+order-service/internal/adapters/http/handler.go:109:		UpdateOrderStatus	94.1%
 order-service/internal/adapters/http/middleware.go:12:		RequestLogger		100.0%
 order-service/internal/adapters/http/middleware.go:35:		generateTraceID		100.0%
 order-service/internal/adapters/http/router.go:12:		NewRouter		100.0%
@@ -147,15 +147,15 @@ order-service/internal/adapters/mongodb/order_repository.go:56:	Update			70.0%
 order-service/internal/adapters/rabbitmq/publisher.go:24:	NewPublisher		45.0%
 order-service/internal/adapters/rabbitmq/publisher.go:83:	PublishStatusChanged	62.5%
 order-service/internal/adapters/rabbitmq/publisher.go:107:	Close			50.0%
-order-service/internal/application/order/service.go:34:		NewService		100.0%
-order-service/internal/application/order/service.go:41:		CreateOrder		100.0%
-order-service/internal/application/order/service.go:54:		GetOrderByID		100.0%
-order-service/internal/application/order/service.go:58:		UpdateOrderStatus	100.0%
-order-service/internal/domain/order/order.go:26:		NewOrder		100.0%
-order-service/internal/domain/order/order.go:62:		CanTransitionTo		100.0%
-order-service/internal/domain/order/order.go:70:		UpdateStatus		85.7%
+order-service/internal/application/order/service.go:18:		NewService		100.0%
+order-service/internal/application/order/service.go:25:		CreateOrder		100.0%
+order-service/internal/application/order/service.go:42:		GetOrderByID		100.0%
+order-service/internal/application/order/service.go:46:		UpdateOrderStatus	100.0%
+order-service/internal/domain/order/order.go:27:		NewOrder		100.0%
+order-service/internal/domain/order/order.go:64:		CanTransitionTo		100.0%
+order-service/internal/domain/order/order.go:72:		UpdateStatus		85.7%
 order-service/internal/domain/order/status.go:12:		IsValid			100.0%
-total:								(statements)		86.5%
+total:								(statements)		87.2%
 ```
 
   - Gerar relatório HTML em `coverage.html` (meta ≥ 60%):
