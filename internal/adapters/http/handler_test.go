@@ -2,7 +2,6 @@ package http
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -13,64 +12,18 @@ import (
 	"order-service/internal/adapters/http/dto"
 	domain "order-service/internal/domain/order"
 	"order-service/internal/domain/ports"
+	"order-service/internal/mocks"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"go.mongodb.org/mongo-driver/v2/bson"
-	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.uber.org/zap"
 )
 
-type mockService struct {
-	mock.Mock
-}
-
-func (m *mockService) CreateOrder(
-	ctx context.Context,
-	customerID string,
-	items []domain.OrderItem,
-) (*domain.Order, error) {
-	args := m.Called(ctx, customerID, items)
-	order, _ := args.Get(0).(*domain.Order)
-	return order, args.Error(1)
-}
-
-func (m *mockService) GetOrderByID(ctx context.Context, id string) (*domain.Order, error) {
-	args := m.Called(ctx, id)
-	order, _ := args.Get(0).(*domain.Order)
-	return order, args.Error(1)
-}
-
-func (m *mockService) UpdateOrderStatus(
-	ctx context.Context,
-	id string,
-	newStatus domain.Status,
-) (*domain.Order, error) {
-	args := m.Called(ctx, id, newStatus)
-	order, _ := args.Get(0).(*domain.Order)
-	return order, args.Error(1)
-}
-
-type mockMongoClient struct {
-	mock.Mock
-}
-
-func (m *mockMongoClient) Database() *mongo.Database { return nil }
-
-func (m *mockMongoClient) Ping(ctx context.Context) error {
-	args := m.Called(ctx)
-	return args.Error(0)
-}
-
-func (m *mockMongoClient) Close(ctx context.Context) error {
-	args := m.Called(ctx)
-	return args.Error(0)
-}
-
 func TestNewHandler(t *testing.T) {
-	svc := new(mockService)
-	db := new(mockMongoClient)
+	svc := new(mocks.MockOrderService)
+	db := new(mocks.MockMongoClient)
 
 	h := NewHandler(svc, db)
 
@@ -78,7 +31,7 @@ func TestNewHandler(t *testing.T) {
 }
 
 func setupRouter(svc ports.Service) *gin.Engine {
-	db := new(mockMongoClient)
+	db := new(mocks.MockMongoClient)
 	db.On("Ping", mock.Anything).Return(nil)
 	handler := NewHandler(svc, db)
 	logger := zap.NewNop()
@@ -86,11 +39,11 @@ func setupRouter(svc ports.Service) *gin.Engine {
 }
 
 func TestHandler_Health(t *testing.T) {
-	svc := new(mockService)
+	svc := new(mocks.MockOrderService)
 	logger := zap.NewNop()
 
 	// caso saudável
-	dbHealthy := new(mockMongoClient)
+	dbHealthy := new(mocks.MockMongoClient)
 	dbHealthy.On("Ping", mock.Anything).Return(nil)
 	handlerHealthy := NewHandler(svc, dbHealthy)
 	router := NewRouter(handlerHealthy, logger)
@@ -109,7 +62,7 @@ func TestHandler_Health(t *testing.T) {
 	assert.NotEmpty(t, resp.Timestamp)
 
 	// caso banco indisponível
-	dbUnhealthy := new(mockMongoClient)
+	dbUnhealthy := new(mocks.MockMongoClient)
 	dbUnhealthy.On("Ping", mock.Anything).Return(errors.New("db down"))
 	handlerUnhealthy := NewHandler(svc, dbUnhealthy)
 	routerUnhealthy := NewRouter(handlerUnhealthy, logger)
@@ -128,7 +81,7 @@ func TestHandler_Health(t *testing.T) {
 }
 
 func TestHandler_CreateOrder_Success(t *testing.T) {
-	svc := new(mockService)
+	svc := new(mocks.MockOrderService)
 	router := setupRouter(svc)
 
 	now := time.Now()
@@ -169,7 +122,7 @@ func TestHandler_CreateOrder_Success(t *testing.T) {
 }
 
 func TestHandler_CreateOrder_InvalidBody(t *testing.T) {
-	svc := new(mockService)
+	svc := new(mocks.MockOrderService)
 	router := setupRouter(svc)
 
 	w := httptest.NewRecorder()
@@ -182,7 +135,7 @@ func TestHandler_CreateOrder_InvalidBody(t *testing.T) {
 }
 
 func TestHandler_CreateOrder_ValidationError(t *testing.T) {
-	svc := new(mockService)
+	svc := new(mocks.MockOrderService)
 	router := setupRouter(svc)
 
 	// JSON válido mas sem items (viola min=1 em binding)
@@ -203,7 +156,7 @@ func TestHandler_CreateOrder_ValidationError(t *testing.T) {
 }
 
 func TestHandler_CreateOrder_ServiceError(t *testing.T) {
-	svc := new(mockService)
+	svc := new(mocks.MockOrderService)
 	router := setupRouter(svc)
 
 	svc.
@@ -230,7 +183,7 @@ func TestHandler_CreateOrder_ServiceError(t *testing.T) {
 }
 
 func TestHandler_GetOrder_NotFound(t *testing.T) {
-	svc := new(mockService)
+	svc := new(mocks.MockOrderService)
 	router := setupRouter(svc)
 
 	svc.
@@ -247,7 +200,7 @@ func TestHandler_GetOrder_NotFound(t *testing.T) {
 }
 
 func TestHandler_GetOrder_Success(t *testing.T) {
-	svc := new(mockService)
+	svc := new(mocks.MockOrderService)
 	router := setupRouter(svc)
 
 	now := time.Now()
@@ -273,7 +226,7 @@ func TestHandler_GetOrder_Success(t *testing.T) {
 }
 
 func TestHandler_GetOrder_OtherError(t *testing.T) {
-	svc := new(mockService)
+	svc := new(mocks.MockOrderService)
 	router := setupRouter(svc)
 
 	svc.
@@ -290,7 +243,7 @@ func TestHandler_GetOrder_OtherError(t *testing.T) {
 }
 
 func TestHandler_UpdateOrderStatus_InvalidStatusBody(t *testing.T) {
-	svc := new(mockService)
+	svc := new(mocks.MockOrderService)
 	router := setupRouter(svc)
 
 	w := httptest.NewRecorder()
@@ -303,7 +256,7 @@ func TestHandler_UpdateOrderStatus_InvalidStatusBody(t *testing.T) {
 }
 
 func TestHandler_UpdateOrderStatus_Success(t *testing.T) {
-	svc := new(mockService)
+	svc := new(mocks.MockOrderService)
 	router := setupRouter(svc)
 
 	now := time.Now()
@@ -336,7 +289,7 @@ func TestHandler_UpdateOrderStatus_Success(t *testing.T) {
 }
 
 func TestHandler_UpdateOrderStatus_ErrOrderNotFound(t *testing.T) {
-	svc := new(mockService)
+	svc := new(mocks.MockOrderService)
 	router := setupRouter(svc)
 
 	svc.
@@ -360,7 +313,7 @@ func TestHandler_UpdateOrderStatus_ErrOrderNotFound(t *testing.T) {
 }
 
 func TestHandler_UpdateOrderStatus_ErrInvalidStatus(t *testing.T) {
-	svc := new(mockService)
+	svc := new(mocks.MockOrderService)
 	router := setupRouter(svc)
 
 	svc.
@@ -384,7 +337,7 @@ func TestHandler_UpdateOrderStatus_ErrInvalidStatus(t *testing.T) {
 }
 
 func TestHandler_UpdateOrderStatus_ErrInvalidStatusTransition(t *testing.T) {
-	svc := new(mockService)
+	svc := new(mocks.MockOrderService)
 	router := setupRouter(svc)
 
 	svc.
@@ -408,7 +361,7 @@ func TestHandler_UpdateOrderStatus_ErrInvalidStatusTransition(t *testing.T) {
 }
 
 func TestHandler_UpdateOrderStatus_OtherError(t *testing.T) {
-	svc := new(mockService)
+	svc := new(mocks.MockOrderService)
 	router := setupRouter(svc)
 
 	svc.
@@ -432,7 +385,7 @@ func TestHandler_UpdateOrderStatus_OtherError(t *testing.T) {
 }
 
 func TestHandler_UpdateOrderStatus_ConcurrentUpdate(t *testing.T) {
-	svc := new(mockService)
+	svc := new(mocks.MockOrderService)
 	router := setupRouter(svc)
 
 	svc.

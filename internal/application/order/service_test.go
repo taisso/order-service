@@ -5,44 +5,15 @@ import (
 	"testing"
 
 	domain "order-service/internal/domain/order"
-	"order-service/internal/domain/ports"
+	"order-service/internal/mocks"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
-type mockOrderRepository struct {
-	mock.Mock
-}
-
-func (m *mockOrderRepository) Create(ctx context.Context, o *domain.Order) error {
-	args := m.Called(ctx, o)
-	return args.Error(0)
-}
-
-func (m *mockOrderRepository) GetByID(ctx context.Context, id string) (*domain.Order, error) {
-	args := m.Called(ctx, id)
-	order, _ := args.Get(0).(*domain.Order)
-	return order, args.Error(1)
-}
-
-func (m *mockOrderRepository) Update(ctx context.Context, o *domain.Order) error {
-	args := m.Called(ctx, o)
-	return args.Error(0)
-}
-
-type mockEventPublisher struct {
-	mock.Mock
-}
-
-func (m *mockEventPublisher) PublishStatusChanged(ctx context.Context, e ports.StatusChangedEvent) error {
-	args := m.Called(ctx, e)
-	return args.Error(0)
-}
-
 func TestService_CreateOrder_Success(t *testing.T) {
-	repo := &mockOrderRepository{}
-	publisher := &mockEventPublisher{}
+	repo := &mocks.MockOrderRepository{}
+	publisher := &mocks.MockEventPublisher{}
 
 	items := []domain.OrderItem{
 		{
@@ -69,8 +40,8 @@ func TestService_CreateOrder_Success(t *testing.T) {
 }
 
 func TestService_CreateOrder_InvalidData(t *testing.T) {
-	repo := &mockOrderRepository{}
-	publisher := &mockEventPublisher{}
+	repo := &mocks.MockOrderRepository{}
+	publisher := &mocks.MockEventPublisher{}
 	svc := NewService(repo, publisher)
 
 	o, err := svc.CreateOrder(context.Background(), "", nil)
@@ -79,8 +50,8 @@ func TestService_CreateOrder_InvalidData(t *testing.T) {
 }
 
 func TestService_CreateOrder_RepoError(t *testing.T) {
-	repo := &mockOrderRepository{}
-	publisher := &mockEventPublisher{}
+	repo := &mocks.MockOrderRepository{}
+	publisher := &mocks.MockEventPublisher{}
 	svc := NewService(repo, publisher)
 
 	items := []domain.OrderItem{
@@ -105,8 +76,8 @@ func TestService_CreateOrder_RepoError(t *testing.T) {
 }
 
 func TestService_GetOrderByID_Success(t *testing.T) {
-	repo := &mockOrderRepository{}
-	publisher := &mockEventPublisher{}
+	repo := &mocks.MockOrderRepository{}
+	publisher := &mocks.MockEventPublisher{}
 	svc := NewService(repo, publisher)
 
 	expected := &domain.Order{CustomerID: "customer-1"}
@@ -124,8 +95,8 @@ func TestService_GetOrderByID_Success(t *testing.T) {
 }
 
 func TestService_UpdateOrderStatus_ValidTransition_PublishesEvent(t *testing.T) {
-	repo := &mockOrderRepository{}
-	publisher := &mockEventPublisher{}
+	repo := &mocks.MockOrderRepository{}
+	publisher := &mocks.MockEventPublisher{}
 	svc := NewService(repo, publisher)
 
 	ctx := context.Background()
@@ -153,8 +124,8 @@ func TestService_UpdateOrderStatus_ValidTransition_PublishesEvent(t *testing.T) 
 }
 
 func TestService_UpdateOrderStatus_InvalidStatus(t *testing.T) {
-	repo := &mockOrderRepository{}
-	publisher := &mockEventPublisher{}
+	repo := &mocks.MockOrderRepository{}
+	publisher := &mocks.MockEventPublisher{}
 	svc := NewService(repo, publisher)
 
 	ctx := context.Background()
@@ -169,8 +140,8 @@ func TestService_UpdateOrderStatus_InvalidStatus(t *testing.T) {
 }
 
 func TestService_UpdateOrderStatus_InvalidTransition(t *testing.T) {
-	repo := &mockOrderRepository{}
-	publisher := &mockEventPublisher{}
+	repo := &mocks.MockOrderRepository{}
+	publisher := &mocks.MockEventPublisher{}
 	svc := NewService(repo, publisher)
 
 	ctx := context.Background()
@@ -193,8 +164,8 @@ func TestService_UpdateOrderStatus_InvalidTransition(t *testing.T) {
 }
 
 func TestService_UpdateOrderStatus_RepoGetError(t *testing.T) {
-	repo := &mockOrderRepository{}
-	publisher := &mockEventPublisher{}
+	repo := &mocks.MockOrderRepository{}
+	publisher := &mocks.MockEventPublisher{}
 	svc := NewService(repo, publisher)
 
 	ctx := context.Background()
@@ -212,8 +183,8 @@ func TestService_UpdateOrderStatus_RepoGetError(t *testing.T) {
 }
 
 func TestService_UpdateOrderStatus_PublisherFailureReturnsError(t *testing.T) {
-	repo := &mockOrderRepository{}
-	publisher := &mockEventPublisher{}
+	repo := &mocks.MockOrderRepository{}
+	publisher := &mocks.MockEventPublisher{}
 	svc := NewService(repo, publisher)
 
 	ctx := context.Background()
@@ -241,8 +212,8 @@ func TestService_UpdateOrderStatus_PublisherFailureReturnsError(t *testing.T) {
 }
 
 func TestService_UpdateOrderStatus_RepoUpdateError(t *testing.T) {
-	repo := &mockOrderRepository{}
-	publisher := &mockEventPublisher{}
+	repo := &mocks.MockOrderRepository{}
+	publisher := &mocks.MockEventPublisher{}
 	svc := NewService(repo, publisher)
 
 	ctx := context.Background()
