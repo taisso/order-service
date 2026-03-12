@@ -31,6 +31,18 @@ Content-Type: application/json
       "product_name": "Bola de futebol",
       "quantity": 1,
       "unit_price": 100.00
+    },
+    {
+      "product_id": "prod-04",
+      "product_name": "Carrinho de bebê",
+      "quantity": 1,
+      "unit_price": 200.00
+    },
+    {
+      "product_id": "prod-05",
+      "product_name": "Cadeira de bebê",
+      "quantity": 1,
+      "unit_price": 300.00
     }
   ]
 }
