@@ -1,6 +1,7 @@
 package http
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -83,7 +84,7 @@ func (h *Handler) GetOrder(c *gin.Context) {
 	id := c.Param("id")
 	order, err := h.service.GetOrderByID(c.Request.Context(), id)
 	if err != nil {
-		if err == domain.ErrOrderNotFound {
+		if errors.Is(err, domain.ErrOrderNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "order not found"})
 			return
 		}
