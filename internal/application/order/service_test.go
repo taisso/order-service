@@ -29,7 +29,7 @@ func TestService_CreateOrder_Success(t *testing.T) {
 		Return(nil)
 	svc := NewService(repo, publisher)
 
-	o, err := svc.CreateOrder(context.Background(), "customer-42", items)
+	o, err := svc.CreateOrder(context.TODO(), "customer-42", items)
 	assert.NoError(t, err)
 	assert.Equal(t, "customer-42", o.CustomerID)
 	assert.Equal(t, domain.StatusCreated, o.Status)
@@ -44,7 +44,7 @@ func TestService_CreateOrder_InvalidData(t *testing.T) {
 	publisher := new(mocks.MockEventPublisher)
 	svc := NewService(repo, publisher)
 
-	o, err := svc.CreateOrder(context.Background(), "", nil)
+	o, err := svc.CreateOrder(context.TODO(), "", nil)
 	assert.Error(t, err)
 	assert.Nil(t, o)
 }
@@ -67,7 +67,7 @@ func TestService_CreateOrder_RepoError(t *testing.T) {
 		On("Create", mock.Anything, mock.AnythingOfType("*order.Order")).
 		Return(assert.AnError)
 
-	o, err := svc.CreateOrder(context.Background(), "customer-1", items)
+	o, err := svc.CreateOrder(context.TODO(), "customer-1", items)
 	assert.Error(t, err)
 	assert.Nil(t, o)
 
@@ -86,7 +86,7 @@ func TestService_GetOrderByID_Success(t *testing.T) {
 		On("GetByID", mock.Anything, "id-1").
 		Return(expected, nil)
 
-	o, err := svc.GetOrderByID(context.Background(), "id-1")
+	o, err := svc.GetOrderByID(context.TODO(), "id-1")
 	assert.NoError(t, err)
 	assert.Equal(t, expected, o)
 
@@ -99,7 +99,7 @@ func TestService_UpdateOrderStatus_ValidTransition_PublishesEvent(t *testing.T) 
 	publisher := new(mocks.MockEventPublisher)
 	svc := NewService(repo, publisher)
 
-	ctx := context.Background()
+	ctx := context.TODO()
 
 	existing := &domain.Order{
 		Status: domain.StatusCreated,
@@ -128,7 +128,7 @@ func TestService_UpdateOrderStatus_InvalidStatus(t *testing.T) {
 	publisher := new(mocks.MockEventPublisher)
 	svc := NewService(repo, publisher)
 
-	ctx := context.Background()
+	ctx := context.TODO()
 
 	updated, err := svc.UpdateOrderStatus(ctx, "id-1", domain.Status("invalido"))
 	assert.Error(t, err)
@@ -144,7 +144,7 @@ func TestService_UpdateOrderStatus_InvalidTransition(t *testing.T) {
 	publisher := new(mocks.MockEventPublisher)
 	svc := NewService(repo, publisher)
 
-	ctx := context.Background()
+	ctx := context.TODO()
 
 	existing := &domain.Order{
 		Status: domain.StatusCreated,
@@ -168,7 +168,7 @@ func TestService_UpdateOrderStatus_RepoGetError(t *testing.T) {
 	publisher := new(mocks.MockEventPublisher)
 	svc := NewService(repo, publisher)
 
-	ctx := context.Background()
+	ctx := context.TODO()
 
 	repo.
 		On("GetByID", mock.Anything, "id-1").
@@ -187,7 +187,7 @@ func TestService_UpdateOrderStatus_PublisherFailureReturnsError(t *testing.T) {
 	publisher := new(mocks.MockEventPublisher)
 	svc := NewService(repo, publisher)
 
-	ctx := context.Background()
+	ctx := context.TODO()
 
 	existing := &domain.Order{
 		Status: domain.StatusCreated,
@@ -216,7 +216,7 @@ func TestService_UpdateOrderStatus_RepoUpdateError(t *testing.T) {
 	publisher := new(mocks.MockEventPublisher)
 	svc := NewService(repo, publisher)
 
-	ctx := context.Background()
+	ctx := context.TODO()
 
 	existing := &domain.Order{
 		Status: domain.StatusCreated,

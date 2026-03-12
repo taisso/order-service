@@ -61,7 +61,7 @@ func (s *OrderRepositoryIntegrationSuite) SetupSuite() {
 
 func (s *OrderRepositoryIntegrationSuite) TearDownSuite() {
 	if s.client != nil {
-		_ = s.client.Disconnect(context.Background())
+		_ = s.client.Disconnect(context.TODO())
 	}
 	if s.pool != nil && s.resource != nil {
 		_ = s.pool.Purge(s.resource)
@@ -69,7 +69,7 @@ func (s *OrderRepositoryIntegrationSuite) TearDownSuite() {
 }
 
 func (s *OrderRepositoryIntegrationSuite) SetupTest() {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
 	err := s.db.Collection("orders").Drop(ctx)
 	s.Require().NoError(err)
@@ -82,7 +82,7 @@ func (s *OrderRepositoryIntegrationSuite) TestCreateAndGetByID() {
 	}, now)
 	s.Require().NoError(err)
 
-	ctx := context.Background()
+	ctx := context.TODO()
 	err = s.repo.Create(ctx, o)
 	s.Require().NoError(err)
 
@@ -99,7 +99,7 @@ func (s *OrderRepositoryIntegrationSuite) TestUpdateStatus() {
 	}, now)
 	s.Require().NoError(err)
 
-	ctx := context.Background()
+	ctx := context.TODO()
 	err = s.repo.Create(ctx, o)
 	s.Require().NoError(err)
 
@@ -121,7 +121,7 @@ func (s *OrderRepositoryIntegrationSuite) TestUpdateStatusConcurrentUpdate() {
 	}, now)
 	s.Require().NoError(err)
 
-	ctx := context.Background()
+	ctx := context.TODO()
 	err = s.repo.Create(ctx, o)
 	s.Require().NoError(err)
 
@@ -150,7 +150,7 @@ func (s *OrderRepositoryIntegrationSuite) TestUpdateStatusConcurrentUpdate() {
 }
 
 func (s *OrderRepositoryIntegrationSuite) TestGetByID_NotFound() {
-	ctx := context.Background()
+	ctx := context.TODO()
 	_, err := s.repo.GetByID(ctx, "000000000000000000000000")
 	assert.Equal(s.T(), domain.ErrOrderNotFound, err)
 }

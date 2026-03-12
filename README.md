@@ -144,7 +144,7 @@ order-service/internal/adapters/http/router.go:12:		NewRouter		100.0%
 order-service/internal/adapters/mongodb/order_repository.go:21:	NewOrderRepository	100.0%
 order-service/internal/adapters/mongodb/order_repository.go:27:	Create			83.3%
 order-service/internal/adapters/mongodb/order_repository.go:39:	GetByID			77.8%
-order-service/internal/adapters/mongodb/order_repository.go:56:	Update			70.0%
+order-service/internal/adapters/mongodb/order_repository.go:56:	Update			80.0%
 order-service/internal/adapters/rabbitmq/publisher.go:24:	NewPublisher		45.0%
 order-service/internal/adapters/rabbitmq/publisher.go:83:	PublishStatusChanged	62.5%
 order-service/internal/adapters/rabbitmq/publisher.go:107:	Close			50.0%
@@ -156,7 +156,7 @@ order-service/internal/domain/order/order.go:27:		NewOrder		100.0%
 order-service/internal/domain/order/order.go:64:		CanTransitionTo		100.0%
 order-service/internal/domain/order/order.go:72:		UpdateStatus		100.0%
 order-service/internal/domain/order/status.go:12:		IsValid			100.0%
-total:								(statements)		88.3%
+total:								(statements)		88.2%
 ```
 
   - Gerar relatório HTML em `coverage.html` (meta ≥ 60%):

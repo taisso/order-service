@@ -69,7 +69,7 @@ func (s *PublisherIntegrationSuite) TearDownSuite() {
 }
 
 func (s *PublisherIntegrationSuite) TestPublishAndConsume() {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.TODO(), 10*time.Second)
 	defer cancel()
 
 	event := ports.StatusChangedEvent{

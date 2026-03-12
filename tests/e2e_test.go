@@ -91,7 +91,7 @@ func (s *E2ESuite) SetupSuite() {
 
 func (s *E2ESuite) TearDownSuite() {
 	if s.mongoClient != nil {
-		_ = s.mongoClient.Close(context.Background())
+		_ = s.mongoClient.Close(context.TODO())
 	}
 	if s.mongo != nil && s.mongo.Pool != nil && s.mongo.Resource != nil {
 		_ = s.mongo.Pool.Purge(s.mongo.Resource)
@@ -129,11 +129,9 @@ func (s *E2ESuite) TestOrderFlow() {
 	resp := s.ExecuteRequest(req)
 	s.Equal(http.StatusCreated, resp.Code)
 
-	var created struct {
-		ID string `json:"id"`
-	}
-	s.Require().NoError(json.NewDecoder(resp.Body).Decode(&created))
-	s.NotEmpty(created.ID)
+	var output dto.OrderResponse
+	s.Require().NoError(json.NewDecoder(resp.Body).Decode(&output))
+	s.NotEmpty(output.ID)
 
 	// PATCH /orders/:id/status para em_processamento
 	updateStatusRequest := dto.UpdateStatusRequest{
@@ -142,7 +140,7 @@ func (s *E2ESuite) TestOrderFlow() {
 	body, err = json.Marshal(updateStatusRequest)
 	s.Require().NoError(err)
 
-	path := fmt.Sprintf("/orders/%s/status", created.ID)
+	path := fmt.Sprintf("/orders/%s/status", output.ID)
 	req = httptest.NewRequest(http.MethodPatch, path, bytes.NewReader(body))
 	resp = s.ExecuteRequest(req)
 	s.Equal(http.StatusOK, resp.Code)
@@ -159,16 +157,13 @@ func (s *E2ESuite) TestOrderFlow() {
 	s.Equal(http.StatusOK, resp.Code)
 
 	// GET /orders/:id
-	path = fmt.Sprintf("/orders/%s", created.ID)
+	path = fmt.Sprintf("/orders/%s", output.ID)
 	req = httptest.NewRequest(http.MethodGet, path, nil)
 	resp = s.ExecuteRequest(req)
 	s.Equal(http.StatusOK, resp.Code)
 
-	var got struct {
-		Status string `json:"status"`
-	}
-	s.Require().NoError(json.NewDecoder(resp.Body).Decode(&got))
-	s.Equal("enviado", got.Status)
+	s.Require().NoError(json.NewDecoder(resp.Body).Decode(&output))
+	s.Equal("enviado", output.Status)
 
 	// GET /health
 	req = httptest.NewRequest(http.MethodGet, "/health", nil)
