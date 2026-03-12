@@ -1,6 +1,6 @@
 ## Serviço de Gerenciamento de Pedidos (Order Service)
 
-Microsserviço em Go para gerenciamento de pedidos de e-commerce, seguindo arquitetura hexagonal, com MongoDB, RabbitMQ, Gin, testes (unitários, integração e end-to-end), documentação Swagger.
+Microsserviço em Go para gerenciamento de pedidos de e-commerce, seguindo arquitetura hexagonal e arquitetura limpa, com MongoDB, RabbitMQ, Gin, testes (unitários, integração e end-to-end), documentação Swagger.
 
 ![Modelagem do banco](modelagem.png)
 
@@ -42,12 +42,14 @@ make docker-down
 ```bash
 make dev
 ```
+> Caso executar aplicação fora do container, mas que já tenha o banco e a fila configurados
 
 - Executar a aplicação sem hot-reload:
 
 ```bash
 make run
 ```
+> Caso executar aplicação fora do container, mas que já tenha o banco e a fila configurados
 
 ### Variáveis de ambiente
 
@@ -72,6 +74,7 @@ make run
 
 ### Comandos principais (Makefile)
 
+- **Rodar aplicação**: `make run`
 - **Rodar em desenvolvimento (hot reload)**: `make dev`
 - **Build do binário**: `make build`
 - **Testes + cobertura (domínio, aplicação, adapters)**: `make test`
@@ -173,7 +176,7 @@ go tool cover -html=coverage.out -o coverage.html
 
 ### Principais decisões técnicas
 
-- **Arquitetura**: hexagonal (Ports & Adapters), com domínio e aplicação independentes de detalhes de infra.
+- **Arquitetura**: hexagonal e arquitetura limpa (Ports & Adapters), com domínio e aplicação independentes de detalhes de infra.
 - **Persistência**: MongoDB Driver v2, repositório recebe `*mongo.Database` para facilitar troca de banco e testes.
 - **Mensageria**: RabbitMQ com exchange `orders`, routing key `order.status.updated` e evento de mudança de status tipado.
 - **Configuração**: `cleanenv` lendo exclusivamente de `.env`, com validação de variáveis obrigatórias.
