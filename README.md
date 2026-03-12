@@ -2,7 +2,7 @@
 
 Microsserviço em Go para gerenciamento de pedidos de e-commerce, seguindo arquitetura hexagonal, com MongoDB, RabbitMQ, Gin, testes (unitários, integração e end-to-end), documentação Swagger.
 
-![Modelagem do banco](Modelagem%20do%20banco.drawio.png)
+![Modelagem do banco](modelagem.png)
 
 ### Stack utilizada
 
