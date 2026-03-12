@@ -15,9 +15,12 @@ type Config struct {
 		IdleTimeoutSeconds  int    `env:"APP_IDLE_TIMEOUT_SECONDS"  env-default:"60"`
 	}
 	MongoDB struct {
-		URI            string `env:"MONGODB_URI"              env-required:"true"`
-		Database       string `env:"MONGODB_DATABASE"         env-required:"true"`
-		TimeoutSeconds int    `env:"MONGODB_TIMEOUT_SECONDS"  env-default:"10"`
+		URI                     string `env:"MONGODB_URI"                          env-required:"true"`
+		Database                string `env:"MONGODB_DATABASE"                     env-required:"true"`
+		TimeoutSeconds          int    `env:"MONGODB_TIMEOUT_SECONDS"              env-default:"10"`
+		MaxPoolSize             uint64 `env:"MONGODB_MAX_POOL_SIZE"                env-default:"0"`
+		MinPoolSize             uint64 `env:"MONGODB_MIN_POOL_SIZE"                env-default:"0"`
+		MaxConnIdleTimeSeconds  int    `env:"MONGODB_MAX_CONN_IDLE_TIME_SECONDS"   env-default:"0"`
 	}
 	RabbitMQ struct {
 		URI        string `env:"RABBITMQ_URI"         env-required:"true"`

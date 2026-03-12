@@ -33,7 +33,9 @@ func main() {
 	}
 
 	logger := pkglogger.New(cfg.App.Env, cfg.Logger.Level)
-	defer logger.Sync()
+	defer func() {
+		_ = logger.Sync()
+	}()
 
 	ctx := context.Background()
 

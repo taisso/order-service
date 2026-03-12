@@ -61,6 +61,9 @@ make run
 | `MONGODB_URI`           | **Sim**    | —            | URI de conexão do MongoDB             |
 | `MONGODB_DATABASE`      | **Sim**    | —            | Nome do database do MongoDB           |
 | `MONGODB_TIMEOUT_SECONDS` | Não      | `10`         | Timeout (segundos) para operações Mongo|
+| `MONGODB_MAX_POOL_SIZE`   | Não      | `0`          | Tamanho máximo do pool de conexões MongoDB (0 = default do driver) |
+| `MONGODB_MIN_POOL_SIZE`   | Não      | `0`          | Tamanho mínimo do pool de conexões MongoDB (0 = default do driver) |
+| `MONGODB_MAX_CONN_IDLE_TIME_SECONDS` | Não | `0` | Tempo máximo de ociosidade de uma conexão no pool (0 = default do driver) |
 | `RABBITMQ_URI`          | **Sim**    | —            | URI de conexão do RabbitMQ            |
 | `RABBITMQ_EXCHANGE`     | Não        | `orders`     | Nome do exchange para eventos de pedido|
 | `RABBITMQ_QUEUE`        | **Sim**    | —            | Nome da fila de eventos de status     |

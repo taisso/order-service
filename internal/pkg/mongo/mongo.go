@@ -25,6 +25,16 @@ type client struct {
 func New(ctx context.Context, cfg *config.Config) (Client, error) {
 	clientOpts := options.Client().ApplyURI(cfg.MongoDB.URI)
 
+	if cfg.MongoDB.MaxPoolSize > 0 {
+		clientOpts.SetMaxPoolSize(cfg.MongoDB.MaxPoolSize)
+	}
+	if cfg.MongoDB.MinPoolSize > 0 {
+		clientOpts.SetMinPoolSize(cfg.MongoDB.MinPoolSize)
+	}
+	if cfg.MongoDB.MaxConnIdleTimeSeconds > 0 {
+		clientOpts.SetMaxConnIdleTime(time.Duration(cfg.MongoDB.MaxConnIdleTimeSeconds) * time.Second)
+	}
+
 	mongoClient, err := mongo.Connect(clientOpts)
 	if err != nil {
 		return nil, err
@@ -52,10 +62,10 @@ func (c *client) Database() *mongo.Database {
 }
 
 func (c *client) Ping(ctx context.Context) error {
-	pingCtx, pingCancel := context.WithTimeout(ctx, time.Duration(c.cfg.MongoDB.TimeoutSeconds)*time.Second)
+	ctx, pingCancel := context.WithTimeout(ctx, time.Duration(c.cfg.MongoDB.TimeoutSeconds)*time.Second)
 	defer pingCancel()
 
-	return c.client.Ping(pingCtx, nil)
+	return c.client.Ping(ctx, nil)
 }
 
 func (c *client) Close(ctx context.Context) error {
