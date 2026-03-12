@@ -88,6 +88,7 @@ make run
 - `PATCH /orders/:id/status` – atualiza status do pedido (publica evento no RabbitMQ). Aceita qualquer transição entre os status válidos (`criado`, `em_processamento`, `enviado`, `entregue`), mas rejeita tentativas de atualizar para o mesmo status atual.
 - `GET /health` – healthcheck
 - `GET /swagger/index.html` – Swagger UI
+- Arquivo `api.http` na raiz do projeto com exemplos de requisições HTTP para testar os endpoints (pode ser usado em IDEs).
 
 ### Testes e cobertura
 
