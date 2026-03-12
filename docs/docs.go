@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/health": {
             "get": {
-                "description": "Verifica se o serviço está saudável (inclui ping ao MongoDB)",
+                "description": "Verifica se o serviço está saudável",
                 "produces": [
                     "application/json"
                 ],
