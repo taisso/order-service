@@ -1,5 +1,5 @@
 @baseUrl = http://localhost:8080
-@orderId = 69b1e55f234bff11e77b10df
+@orderId = REPLACE_WITH_ORDER_ID
 
 ### Healthcheck
 GET {{baseUrl}}/health
@@ -24,6 +24,12 @@ Content-Type: application/json
       "product_name": "Camiseta Runner X",
       "quantity": 1,
       "unit_price": 59.90
+    },
+    {
+      "product_id": "prod-03",
+      "product_name": "Bola de futebol",
+      "quantity": 1,
+      "unit_price": 100.00
     }
   ]
 }
