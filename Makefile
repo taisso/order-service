@@ -2,7 +2,7 @@ APP_NAME := order-service
 BIN := bin/$(APP_NAME)
 
 # Caminhos mais críticos para cobertura
-COVER_PKGS := ./internal/domain/...,./internal/application/...,./internal/adapters/http/...,./internal/adapters/mongodb/...,./internal/adapters/rabbitmq/...
+COVER_PKGS := ./internal/domain/...,./internal/application/...,./internal/adapters/...
 
 .PHONY: run dev build test coverage coverage-html swagger lint docker-up docker-down migrate
 
