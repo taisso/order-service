@@ -102,12 +102,12 @@ func TestUpdateStatus_Transitions(t *testing.T) {
 	assert.NoError(t, err)
 
 	// criado -> em_processamento
-	err = o.UpdateStatus(StatusProcessing, now)
+	err = o.UpdateStatus(StatusProcessing)
 	assert.NoError(t, err)
 	assert.Equal(t, StatusProcessing, o.Status)
 
 	// em_processamento -> entregue
-	err = o.UpdateStatus(StatusDelivered, now)
+	err = o.UpdateStatus(StatusDelivered)
 	assert.NoError(t, err)
 	assert.Equal(t, StatusDelivered, o.Status)
 }
@@ -121,7 +121,7 @@ func TestUpdateStatus_SameStatusError(t *testing.T) {
 	assert.NoError(t, err)
 
 	// criado -> criado (mesmo status deve falhar)
-	err = o.UpdateStatus(StatusCreated, now)
+	err = o.UpdateStatus(StatusCreated)
 	assert.Error(t, err)
 	assert.Equal(t, ErrSameStatus, err)
 	assert.Equal(t, StatusCreated, o.Status)
@@ -137,7 +137,7 @@ func TestUpdateStatus_InvalidStatus(t *testing.T) {
 
 	// status inválido deve retornar ErrInvalidStatus e não alterar o estado
 	invalid := Status("invalido")
-	err = o.UpdateStatus(invalid, now)
+	err = o.UpdateStatus(invalid)
 	assert.Error(t, err)
 	assert.Equal(t, ErrInvalidStatus, err)
 	assert.Equal(t, StatusCreated, o.Status)

@@ -103,7 +103,7 @@ func (s *OrderRepositoryIntegrationSuite) TestUpdateStatus() {
 	err = s.repo.Create(ctx, o)
 	s.Require().NoError(err)
 
-	err = o.UpdateStatus(domain.StatusProcessing, now.Add(time.Minute))
+	err = o.UpdateStatus(domain.StatusProcessing)
 	s.Require().NoError(err)
 
 	err = s.repo.Update(ctx, o)
@@ -135,7 +135,7 @@ func (s *OrderRepositoryIntegrationSuite) TestUpdateStatusConcurrentUpdate() {
 	}
 	for _, status := range status {
 		wg.Go(func() {
-			err = o.UpdateStatus(status, now.Add(time.Minute))
+			err = o.UpdateStatus(status)
 			s.Require().NoError(err)
 
 			err = s.repo.Update(ctx, o)

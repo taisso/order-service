@@ -58,8 +58,7 @@ func (s *Service) UpdateOrderStatus(
 	}
 
 	oldStatus := order.Status
-	now := time.Now()
-	if err = order.UpdateStatus(newStatus, now); err != nil {
+	if err = order.UpdateStatus(newStatus); err != nil {
 		return nil, err
 	}
 
@@ -71,7 +70,7 @@ func (s *Service) UpdateOrderStatus(
 		OrderID:    id,
 		OldStatus:  string(oldStatus),
 		NewStatus:  string(newStatus),
-		OccurredAt: now.UTC().Format(time.RFC3339),
+		OccurredAt: order.UpdatedAt.UTC().Format(time.RFC3339),
 	}
 	if err := s.publisher.PublishStatusChanged(ctx, event); err != nil {
 		return nil, err

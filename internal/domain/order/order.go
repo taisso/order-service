@@ -69,7 +69,7 @@ func (o *Order) CanTransitionTo(newStatus Status) bool {
 	return newStatus != o.Status
 }
 
-func (o *Order) UpdateStatus(newStatus Status, now time.Time) error {
+func (o *Order) UpdateStatus(newStatus Status) error {
 	if !newStatus.IsValid() {
 		return ErrInvalidStatus
 	}
@@ -79,7 +79,7 @@ func (o *Order) UpdateStatus(newStatus Status, now time.Time) error {
 	}
 
 	o.Status = newStatus
-	o.UpdatedAt = now
+	o.UpdatedAt = time.Now()
 
 	return nil
 }
