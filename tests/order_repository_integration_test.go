@@ -2,6 +2,8 @@ package tests
 
 import (
 	"context"
+	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -110,6 +112,41 @@ func (s *OrderRepositoryIntegrationSuite) TestUpdateStatus() {
 	found, err := s.repo.GetByID(ctx, o.ID.Hex())
 	s.Require().NoError(err)
 	s.Equal(domain.StatusProcessing, found.Status)
+}
+
+func (s *OrderRepositoryIntegrationSuite) TestUpdateStatusConcurrentUpdate() {
+	now := time.Now()
+	o, err := domain.NewOrder("customer-1", []domain.OrderItem{
+		{ProductID: "p1", ProductName: "Produto 1", Quantity: 1, UnitPrice: 10},
+	}, now)
+	s.Require().NoError(err)
+
+	ctx := context.Background()
+	err = s.repo.Create(ctx, o)
+	s.Require().NoError(err)
+
+	var wg sync.WaitGroup
+	var countConcurrentUpdates atomic.Int32
+
+	status := []domain.Status{
+		domain.StatusProcessing,
+		domain.StatusDelivered,
+		domain.StatusShipped,
+	}
+	for _, status := range status {
+		wg.Go(func() {
+			err = o.UpdateStatus(status, now.Add(time.Minute))
+			s.Require().NoError(err)
+
+			err = s.repo.Update(ctx, o)
+			if err != nil {
+				countConcurrentUpdates.Add(1)
+			}
+		})
+	}
+
+	wg.Wait()
+	s.Require().Equal(int32(len(status)-1), countConcurrentUpdates.Load())
 }
 
 func (s *OrderRepositoryIntegrationSuite) TestGetByID_NotFound() {

@@ -148,17 +148,15 @@ func TestHandler_CreateOrder_Success(t *testing.T) {
 		On("CreateOrder", mock.Anything, "customer-42", mock.AnythingOfType("[]order.OrderItem")).
 		Return(order, nil)
 
-	body := []byte(`{
-		"customer_id": "customer-42",
-		"items": [
-		  {
-			"product_id": "prod-01",
-			"product_name": "Tênis",
-			"quantity": 2,
-			"unit_price": 199.90
-		  }
-		]
-	  }`)
+	orderRequest := dto.CreateOrderRequest{
+		CustomerID: "customer-42",
+		Items: []dto.CreateOrderItem{
+			{ProductID: "prod-01", ProductName: "Tênis", Quantity: 2, UnitPrice: 199.90},
+		},
+	}
+
+	body, err := json.Marshal(orderRequest)
+	assert.NoError(t, err)
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPost, "/orders", bytes.NewReader(body))
@@ -188,7 +186,12 @@ func TestHandler_CreateOrder_ValidationError(t *testing.T) {
 	router := setupRouter(svc)
 
 	// JSON válido mas sem items (viola min=1 em binding)
-	body := []byte(`{"customer_id":"customer-42","items":[]}`)
+	orderRequest := dto.CreateOrderRequest{
+		CustomerID: "customer-42",
+		Items:      []dto.CreateOrderItem{},
+	}
+	body, err := json.Marshal(orderRequest)
+	assert.NoError(t, err)
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPost, "/orders", bytes.NewReader(body))
@@ -207,17 +210,14 @@ func TestHandler_CreateOrder_ServiceError(t *testing.T) {
 		On("CreateOrder", mock.Anything, "customer-42", mock.AnythingOfType("[]order.OrderItem")).
 		Return((*domain.Order)(nil), assert.AnError)
 
-	body := []byte(`{
-		"customer_id": "customer-42",
-		"items": [
-		  {
-			"product_id": "prod-01",
-			"product_name": "Tênis",
-			"quantity": 2,
-			"unit_price": 199.90
-		  }
-		]
-	  }`)
+	orderRequest := dto.CreateOrderRequest{
+		CustomerID: "customer-42",
+		Items: []dto.CreateOrderItem{
+			{ProductID: "prod-01", ProductName: "Tênis", Quantity: 2, UnitPrice: 199.90},
+		},
+	}
+	body, err := json.Marshal(orderRequest)
+	assert.NoError(t, err)
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPost, "/orders", bytes.NewReader(body))
@@ -319,7 +319,11 @@ func TestHandler_UpdateOrderStatus_Success(t *testing.T) {
 		On("UpdateOrderStatus", mock.Anything, "id-1", domain.StatusProcessing).
 		Return(order, nil)
 
-	body := []byte(`{"status":"em_processamento"}`)
+	updateStatusRequest := dto.UpdateStatusRequest{
+		Status: "em_processamento",
+	}
+	body, err := json.Marshal(updateStatusRequest)
+	assert.NoError(t, err)
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPatch, "/orders/id-1/status", bytes.NewReader(body))
@@ -339,7 +343,11 @@ func TestHandler_UpdateOrderStatus_ErrOrderNotFound(t *testing.T) {
 		On("UpdateOrderStatus", mock.Anything, "id-1", domain.StatusProcessing).
 		Return((*domain.Order)(nil), domain.ErrOrderNotFound)
 
-	body := []byte(`{"status":"em_processamento"}`)
+	updateStatusRequest := dto.UpdateStatusRequest{
+		Status: "em_processamento",
+	}
+	body, err := json.Marshal(updateStatusRequest)
+	assert.NoError(t, err)
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPatch, "/orders/id-1/status", bytes.NewReader(body))
@@ -359,7 +367,11 @@ func TestHandler_UpdateOrderStatus_ErrInvalidStatus(t *testing.T) {
 		On("UpdateOrderStatus", mock.Anything, "id-1", domain.Status("invalido")).
 		Return((*domain.Order)(nil), domain.ErrInvalidStatus)
 
-	body := []byte(`{"status":"invalido"}`)
+	updateStatusRequest := dto.UpdateStatusRequest{
+		Status: "invalido",
+	}
+	body, err := json.Marshal(updateStatusRequest)
+	assert.NoError(t, err)
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPatch, "/orders/id-1/status", bytes.NewReader(body))
@@ -379,7 +391,11 @@ func TestHandler_UpdateOrderStatus_ErrInvalidStatusTransition(t *testing.T) {
 		On("UpdateOrderStatus", mock.Anything, "id-1", domain.StatusProcessing).
 		Return((*domain.Order)(nil), domain.ErrInvalidStatusTransition)
 
-	body := []byte(`{"status":"em_processamento"}`)
+	updateStatusRequest := dto.UpdateStatusRequest{
+		Status: "em_processamento",
+	}
+	body, err := json.Marshal(updateStatusRequest)
+	assert.NoError(t, err)
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPatch, "/orders/id-1/status", bytes.NewReader(body))
@@ -399,7 +415,11 @@ func TestHandler_UpdateOrderStatus_OtherError(t *testing.T) {
 		On("UpdateOrderStatus", mock.Anything, "id-1", domain.StatusProcessing).
 		Return((*domain.Order)(nil), errors.New("db error"))
 
-	body := []byte(`{"status":"em_processamento"}`)
+	updateStatusRequest := dto.UpdateStatusRequest{
+		Status: "em_processamento",
+	}
+	body, err := json.Marshal(updateStatusRequest)
+	assert.NoError(t, err)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPatch, "/orders/id-1/status", bytes.NewReader(body))
@@ -419,7 +439,11 @@ func TestHandler_UpdateOrderStatus_ConcurrentUpdate(t *testing.T) {
 		On("UpdateOrderStatus", mock.Anything, "id-1", domain.StatusProcessing).
 		Return((*domain.Order)(nil), domain.ErrConcurrentUpdate)
 
-	body := []byte(`{"status":"em_processamento"}`)
+	updateStatusRequest := dto.UpdateStatusRequest{
+		Status: "em_processamento",
+	}
+	body, err := json.Marshal(updateStatusRequest)
+	assert.NoError(t, err)
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPatch, "/orders/id-1/status", bytes.NewReader(body))

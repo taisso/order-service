@@ -1,15 +1,16 @@
 package tests
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
 	httpadapter "order-service/internal/adapters/http"
+	"order-service/internal/adapters/http/dto"
 	"order-service/internal/adapters/mongodb"
 	"order-service/internal/adapters/rabbitmq"
 	apporder "order-service/internal/application/order"
@@ -109,20 +110,23 @@ func (s *E2ESuite) ExecuteRequest(req *http.Request) *httptest.ResponseRecorder 
 
 func (s *E2ESuite) TestOrderFlow() {
 	// POST /orders
-	createBody := `{
-		"customer_id": "customer-42",
-		"items": [
-		  {
-			"product_id": "prod-01",
-			"product_name": "Tênis Runner X",
-			"quantity": 2,
-			"unit_price": 199.90
-		  }
-		]
-	  }`
+	orderRequest := dto.CreateOrderRequest{
+		CustomerID: "customer-42",
+		Items: []dto.CreateOrderItem{
+			{
+				ProductID:   "prod-01",
+				ProductName: "Tênis Runner X",
+				Quantity:    2,
+				UnitPrice:   199.90,
+			},
+		},
+	}
 
-	reqCreate := httptest.NewRequest(http.MethodPost, "/orders", strings.NewReader(createBody))
-	resp := s.ExecuteRequest(reqCreate)
+	body, err := json.Marshal(orderRequest)
+	s.Require().NoError(err)
+
+	req := httptest.NewRequest(http.MethodPost, "/orders", bytes.NewReader(body))
+	resp := s.ExecuteRequest(req)
 	s.Equal(http.StatusCreated, resp.Code)
 
 	var created struct {
@@ -132,32 +136,42 @@ func (s *E2ESuite) TestOrderFlow() {
 	s.NotEmpty(created.ID)
 
 	// PATCH /orders/:id/status para em_processamento
-	patchBody := `{"status":"em_processamento"}`
+	updateStatusRequest := dto.UpdateStatusRequest{
+		Status: "em_processamento",
+	}
+	body, err = json.Marshal(updateStatusRequest)
+	s.Require().NoError(err)
+
 	path := fmt.Sprintf("/orders/%s/status", created.ID)
-	reqPatch := httptest.NewRequest(http.MethodPatch, path, strings.NewReader(patchBody))
-	resp2 := s.ExecuteRequest(reqPatch)
-	s.Equal(http.StatusOK, resp2.Code)
+	req = httptest.NewRequest(http.MethodPatch, path, bytes.NewReader(body))
+	resp = s.ExecuteRequest(req)
+	s.Equal(http.StatusOK, resp.Code)
 
 	// PATCH /orders/:id/status pulando diretamente para enviado
-	patchBody = `{"status":"enviado"}`
-	reqPatchSkip := httptest.NewRequest(http.MethodPatch, path, strings.NewReader(patchBody))
-	respSkip := s.ExecuteRequest(reqPatchSkip)
-	s.Equal(http.StatusOK, respSkip.Code)
+	updateStatusRequest = dto.UpdateStatusRequest{
+		Status: "enviado",
+	}
+	body, err = json.Marshal(updateStatusRequest)
+	s.Require().NoError(err)
+
+	req = httptest.NewRequest(http.MethodPatch, path, bytes.NewReader(body))
+	resp = s.ExecuteRequest(req)
+	s.Equal(http.StatusOK, resp.Code)
 
 	// GET /orders/:id
 	path = fmt.Sprintf("/orders/%s", created.ID)
-	reqGet := httptest.NewRequest(http.MethodGet, path, nil)
-	resp3 := s.ExecuteRequest(reqGet)
-	s.Equal(http.StatusOK, resp3.Code)
+	req = httptest.NewRequest(http.MethodGet, path, nil)
+	resp = s.ExecuteRequest(req)
+	s.Equal(http.StatusOK, resp.Code)
 
 	var got struct {
 		Status string `json:"status"`
 	}
-	s.Require().NoError(json.NewDecoder(resp3.Body).Decode(&got))
+	s.Require().NoError(json.NewDecoder(resp.Body).Decode(&got))
 	s.Equal("enviado", got.Status)
 
 	// GET /health
-	reqHealth := httptest.NewRequest(http.MethodGet, "/health", nil)
-	resp4 := s.ExecuteRequest(reqHealth)
-	s.Equal(http.StatusOK, resp4.Code)
+	req = httptest.NewRequest(http.MethodGet, "/health", nil)
+	resp = s.ExecuteRequest(req)
+	s.Equal(http.StatusOK, resp.Code)
 }
