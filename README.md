@@ -6,7 +6,7 @@ Microsserviço em Go para gerenciamento de pedidos de e-commerce, seguindo arqui
 
 ### Stack utilizada
 
-- **Linguagem**: Go 1.26
+- **Linguagem**: Go 1.26.1
 - **HTTP**: Gin
 - **Banco de dados**: MongoDB
 - **Mensageria**: RabbitMQ (AMQP)
