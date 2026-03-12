@@ -5,19 +5,19 @@ import (
 	"time"
 
 	"order-service/internal/adapters/http/dto"
-	apporder "order-service/internal/application/order"
 	domain "order-service/internal/domain/order"
+	"order-service/internal/domain/ports"
 	mongoclient "order-service/internal/pkg/mongo"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
-	service apporder.Service
+	service ports.Service
 	db      mongoclient.Client
 }
 
-func NewHandler(service apporder.Service, db mongoclient.Client) *Handler {
+func NewHandler(service ports.Service, db mongoclient.Client) *Handler {
 	return &Handler{service: service, db: db}
 }
 
@@ -127,8 +127,8 @@ func (h *Handler) UpdateOrderStatus(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "same status"})
 		case domain.ErrInvalidStatusTransition:
 			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "invalid status transition"})
-	case domain.ErrConcurrentUpdate:
-		c.JSON(http.StatusConflict, gin.H{"error": "concurrent update"})
+		case domain.ErrConcurrentUpdate:
+			c.JSON(http.StatusConflict, gin.H{"error": "concurrent update"})
 		default:
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}

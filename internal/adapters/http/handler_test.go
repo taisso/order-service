@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"order-service/internal/adapters/http/dto"
-	apporder "order-service/internal/application/order"
 	domain "order-service/internal/domain/order"
+	"order-service/internal/domain/ports"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -77,7 +77,7 @@ func TestNewHandler(t *testing.T) {
 	assert.NotNil(t, h)
 }
 
-func setupRouter(svc apporder.Service) *gin.Engine {
+func setupRouter(svc ports.Service) *gin.Engine {
 	db := new(mockMongoClient)
 	db.On("Ping", mock.Anything).Return(nil)
 	handler := NewHandler(svc, db)

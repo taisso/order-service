@@ -8,25 +8,21 @@ import (
 	"order-service/internal/domain/ports"
 )
 
-type Service interface {
-	CreateOrder(ctx context.Context, customerID string, items []domain.OrderItem) (*domain.Order, error)
-	GetOrderByID(ctx context.Context, id string) (*domain.Order, error)
-	UpdateOrderStatus(ctx context.Context, id string, newStatus domain.Status) (*domain.Order, error)
-}
+var _ ports.Service = (*Service)(nil)
 
-type service struct {
+type Service struct {
 	repo      ports.OrderRepository
 	publisher ports.EventPublisher
 }
 
-func NewService(repo ports.OrderRepository, publisher ports.EventPublisher) Service {
-	return &service{
+func NewService(repo ports.OrderRepository, publisher ports.EventPublisher) *Service {
+	return &Service{
 		repo:      repo,
 		publisher: publisher,
 	}
 }
 
-func (s *service) CreateOrder(
+func (s *Service) CreateOrder(
 	ctx context.Context,
 	customerID string,
 	items []domain.OrderItem,
@@ -43,11 +39,11 @@ func (s *service) CreateOrder(
 	return order, nil
 }
 
-func (s *service) GetOrderByID(ctx context.Context, id string) (*domain.Order, error) {
+func (s *Service) GetOrderByID(ctx context.Context, id string) (*domain.Order, error) {
 	return s.repo.GetByID(ctx, id)
 }
 
-func (s *service) UpdateOrderStatus(
+func (s *Service) UpdateOrderStatus(
 	ctx context.Context,
 	id string,
 	newStatus domain.Status,
