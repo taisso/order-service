@@ -2,22 +2,10 @@ package order
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	domain "order-service/internal/domain/order"
 	"order-service/internal/domain/ports"
-)
-
-var (
-	ErrInvalidOrder            = errors.New("invalid order")
-	ErrEmptyItems              = errors.New("order must have at least one item")
-	ErrInvalidItem             = errors.New("invalid order item")
-	ErrInvalidQuantity         = errors.New("invalid item quantity")
-	ErrInvalidUnitPrice        = errors.New("invalid item unit price")
-	ErrInvalidStatus           = errors.New("invalid status")
-	ErrInvalidStatusTransition = errors.New("invalid status transition")
-	ErrOrderNotFound           = errors.New("order not found")
 )
 
 type Service interface {
@@ -38,7 +26,11 @@ func NewService(repo ports.OrderRepository, publisher ports.EventPublisher) Serv
 	}
 }
 
-func (s *service) CreateOrder(ctx context.Context, customerID string, items []domain.OrderItem) (*domain.Order, error) {
+func (s *service) CreateOrder(
+	ctx context.Context,
+	customerID string,
+	items []domain.OrderItem,
+) (*domain.Order, error) {
 	order, err := domain.NewOrder(customerID, items, time.Now())
 	if err != nil {
 		return nil, err
@@ -55,7 +47,11 @@ func (s *service) GetOrderByID(ctx context.Context, id string) (*domain.Order, e
 	return s.repo.GetByID(ctx, id)
 }
 
-func (s *service) UpdateOrderStatus(ctx context.Context, id string, newStatus domain.Status) (*domain.Order, error) {
+func (s *service) UpdateOrderStatus(
+	ctx context.Context,
+	id string,
+	newStatus domain.Status,
+) (*domain.Order, error) {
 	if !newStatus.IsValid() {
 		return nil, domain.ErrInvalidStatus
 	}

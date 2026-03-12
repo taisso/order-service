@@ -127,6 +127,8 @@ func (h *Handler) UpdateOrderStatus(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "same status"})
 		case domain.ErrInvalidStatusTransition:
 			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "invalid status transition"})
+	case domain.ErrConcurrentUpdate:
+		c.JSON(http.StatusConflict, gin.H{"error": "concurrent update"})
 		default:
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}

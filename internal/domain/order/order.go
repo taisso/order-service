@@ -12,6 +12,7 @@ type Order struct {
 	Items      []OrderItem   `bson:"items" json:"items"`
 	Status     Status        `bson:"status" json:"status"`
 	TotalPrice float64       `bson:"total_price" json:"total_price"`
+	Version    int64         `bson:"version" json:"version"`
 	CreatedAt  time.Time     `bson:"created_at" json:"created_at"`
 	UpdatedAt  time.Time     `bson:"updated_at" json:"updated_at"`
 }
@@ -52,6 +53,7 @@ func NewOrder(customerID string, items []OrderItem, now time.Time) (*Order, erro
 		Items:      items,
 		Status:     StatusCreated,
 		TotalPrice: total,
+		Version:    1,
 		CreatedAt:  now,
 		UpdatedAt:  now,
 	}

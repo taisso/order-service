@@ -26,7 +26,11 @@ type mockService struct {
 	mock.Mock
 }
 
-func (m *mockService) CreateOrder(ctx context.Context, customerID string, items []domain.OrderItem) (*domain.Order, error) {
+func (m *mockService) CreateOrder(
+	ctx context.Context,
+	customerID string,
+	items []domain.OrderItem,
+) (*domain.Order, error) {
 	args := m.Called(ctx, customerID, items)
 	order, _ := args.Get(0).(*domain.Order)
 	return order, args.Error(1)
@@ -38,7 +42,11 @@ func (m *mockService) GetOrderByID(ctx context.Context, id string) (*domain.Orde
 	return order, args.Error(1)
 }
 
-func (m *mockService) UpdateOrderStatus(ctx context.Context, id string, newStatus domain.Status) (*domain.Order, error) {
+func (m *mockService) UpdateOrderStatus(
+	ctx context.Context,
+	id string,
+	newStatus domain.Status,
+) (*domain.Order, error) {
 	args := m.Called(ctx, id, newStatus)
 	order, _ := args.Get(0).(*domain.Order)
 	return order, args.Error(1)
@@ -61,8 +69,8 @@ func (m *mockMongoClient) Close(ctx context.Context) error {
 }
 
 func TestNewHandler(t *testing.T) {
-	svc := &mockService{}
-	db := &mockMongoClient{}
+	svc := new(mockService)
+	db := new(mockMongoClient)
 
 	h := NewHandler(svc, db)
 
@@ -70,7 +78,7 @@ func TestNewHandler(t *testing.T) {
 }
 
 func setupRouter(svc apporder.Service) *gin.Engine {
-	db := &mockMongoClient{}
+	db := new(mockMongoClient)
 	db.On("Ping", mock.Anything).Return(nil)
 	handler := NewHandler(svc, db)
 	logger := zap.NewNop()
@@ -78,11 +86,11 @@ func setupRouter(svc apporder.Service) *gin.Engine {
 }
 
 func TestHandler_Health(t *testing.T) {
-	svc := &mockService{}
+	svc := new(mockService)
 	logger := zap.NewNop()
 
 	// caso saudável
-	dbHealthy := &mockMongoClient{}
+	dbHealthy := new(mockMongoClient)
 	dbHealthy.On("Ping", mock.Anything).Return(nil)
 	handlerHealthy := NewHandler(svc, dbHealthy)
 	router := NewRouter(handlerHealthy, logger)
@@ -101,7 +109,7 @@ func TestHandler_Health(t *testing.T) {
 	assert.NotEmpty(t, resp.Timestamp)
 
 	// caso banco indisponível
-	dbUnhealthy := &mockMongoClient{}
+	dbUnhealthy := new(mockMongoClient)
 	dbUnhealthy.On("Ping", mock.Anything).Return(errors.New("db down"))
 	handlerUnhealthy := NewHandler(svc, dbUnhealthy)
 	routerUnhealthy := NewRouter(handlerUnhealthy, logger)
@@ -120,7 +128,7 @@ func TestHandler_Health(t *testing.T) {
 }
 
 func TestHandler_CreateOrder_Success(t *testing.T) {
-	svc := &mockService{}
+	svc := new(mockService)
 	router := setupRouter(svc)
 
 	now := time.Now()
@@ -163,7 +171,7 @@ func TestHandler_CreateOrder_Success(t *testing.T) {
 }
 
 func TestHandler_CreateOrder_InvalidBody(t *testing.T) {
-	svc := &mockService{}
+	svc := new(mockService)
 	router := setupRouter(svc)
 
 	w := httptest.NewRecorder()
@@ -176,7 +184,7 @@ func TestHandler_CreateOrder_InvalidBody(t *testing.T) {
 }
 
 func TestHandler_CreateOrder_ValidationError(t *testing.T) {
-	svc := &mockService{}
+	svc := new(mockService)
 	router := setupRouter(svc)
 
 	// JSON válido mas sem items (viola min=1 em binding)
@@ -192,7 +200,7 @@ func TestHandler_CreateOrder_ValidationError(t *testing.T) {
 }
 
 func TestHandler_CreateOrder_ServiceError(t *testing.T) {
-	svc := &mockService{}
+	svc := new(mockService)
 	router := setupRouter(svc)
 
 	svc.
@@ -222,7 +230,7 @@ func TestHandler_CreateOrder_ServiceError(t *testing.T) {
 }
 
 func TestHandler_GetOrder_NotFound(t *testing.T) {
-	svc := &mockService{}
+	svc := new(mockService)
 	router := setupRouter(svc)
 
 	svc.
@@ -239,7 +247,7 @@ func TestHandler_GetOrder_NotFound(t *testing.T) {
 }
 
 func TestHandler_GetOrder_Success(t *testing.T) {
-	svc := &mockService{}
+	svc := new(mockService)
 	router := setupRouter(svc)
 
 	now := time.Now()
@@ -265,7 +273,7 @@ func TestHandler_GetOrder_Success(t *testing.T) {
 }
 
 func TestHandler_GetOrder_OtherError(t *testing.T) {
-	svc := &mockService{}
+	svc := new(mockService)
 	router := setupRouter(svc)
 
 	svc.
@@ -282,7 +290,7 @@ func TestHandler_GetOrder_OtherError(t *testing.T) {
 }
 
 func TestHandler_UpdateOrderStatus_InvalidStatusBody(t *testing.T) {
-	svc := &mockService{}
+	svc := new(mockService)
 	router := setupRouter(svc)
 
 	w := httptest.NewRecorder()
@@ -295,7 +303,7 @@ func TestHandler_UpdateOrderStatus_InvalidStatusBody(t *testing.T) {
 }
 
 func TestHandler_UpdateOrderStatus_Success(t *testing.T) {
-	svc := &mockService{}
+	svc := new(mockService)
 	router := setupRouter(svc)
 
 	now := time.Now()
@@ -324,7 +332,7 @@ func TestHandler_UpdateOrderStatus_Success(t *testing.T) {
 }
 
 func TestHandler_UpdateOrderStatus_ErrOrderNotFound(t *testing.T) {
-	svc := &mockService{}
+	svc := new(mockService)
 	router := setupRouter(svc)
 
 	svc.
@@ -344,7 +352,7 @@ func TestHandler_UpdateOrderStatus_ErrOrderNotFound(t *testing.T) {
 }
 
 func TestHandler_UpdateOrderStatus_ErrInvalidStatus(t *testing.T) {
-	svc := &mockService{}
+	svc := new(mockService)
 	router := setupRouter(svc)
 
 	svc.
@@ -364,7 +372,7 @@ func TestHandler_UpdateOrderStatus_ErrInvalidStatus(t *testing.T) {
 }
 
 func TestHandler_UpdateOrderStatus_ErrInvalidStatusTransition(t *testing.T) {
-	svc := &mockService{}
+	svc := new(mockService)
 	router := setupRouter(svc)
 
 	svc.
@@ -384,7 +392,7 @@ func TestHandler_UpdateOrderStatus_ErrInvalidStatusTransition(t *testing.T) {
 }
 
 func TestHandler_UpdateOrderStatus_OtherError(t *testing.T) {
-	svc := &mockService{}
+	svc := new(mockService)
 	router := setupRouter(svc)
 
 	svc.
@@ -400,5 +408,25 @@ func TestHandler_UpdateOrderStatus_OtherError(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusBadRequest, w.Code)
+	svc.AssertExpectations(t)
+}
+
+func TestHandler_UpdateOrderStatus_ConcurrentUpdate(t *testing.T) {
+	svc := new(mockService)
+	router := setupRouter(svc)
+
+	svc.
+		On("UpdateOrderStatus", mock.Anything, "id-1", domain.StatusProcessing).
+		Return((*domain.Order)(nil), domain.ErrConcurrentUpdate)
+
+	body := []byte(`{"status":"em_processamento"}`)
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodPatch, "/orders/id-1/status", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusConflict, w.Code)
 	svc.AssertExpectations(t)
 }

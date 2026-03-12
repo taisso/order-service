@@ -12,4 +12,5 @@ var (
 	ErrInvalidStatusTransition = errors.New("invalid status transition")
 	ErrSameStatus              = errors.New("same status")
 	ErrOrderNotFound           = errors.New("order not found")
+	ErrConcurrentUpdate        = errors.New("concurrent update")
 )

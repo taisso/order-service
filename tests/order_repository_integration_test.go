@@ -101,8 +101,8 @@ func (s *OrderRepositoryIntegrationSuite) TestUpdateStatus() {
 	err = s.repo.Create(ctx, o)
 	s.Require().NoError(err)
 
-	o.Status = domain.StatusProcessing
-	o.UpdatedAt = now.Add(time.Minute)
+	err = o.UpdateStatus(domain.StatusProcessing, now.Add(time.Minute))
+	s.Require().NoError(err)
 
 	err = s.repo.Update(ctx, o)
 	s.Require().NoError(err)

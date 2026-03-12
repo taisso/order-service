@@ -58,22 +58,30 @@ func (r *OrderRepository) Update(ctx context.Context, o *order.Order) error {
 		return order.ErrInvalidOrder
 	}
 
-	filter := bson.M{"_id": o.ID}
-	update := bson.M{"$set": bson.M{
-		"customer_id": o.CustomerID,
-		"items":       o.Items,
-		"status":      o.Status,
-		"total_price": o.TotalPrice,
-		"created_at":  o.CreatedAt,
-		"updated_at":  o.UpdatedAt,
-	}}
+	filter := bson.M{
+		"_id":     o.ID,
+		"version": o.Version,
+	}
+	update := bson.M{
+		"$set": bson.M{
+			"customer_id": o.CustomerID,
+			"items":       o.Items,
+			"status":      o.Status,
+			"total_price": o.TotalPrice,
+			"created_at":  o.CreatedAt,
+			"updated_at":  o.UpdatedAt,
+		},
+		"$inc": bson.M{
+			"version": 1,
+		},
+	}
 
 	res, err := r.collection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return fmt.Errorf("mongo update order: %w", err)
 	}
 	if res.MatchedCount == 0 {
-		return order.ErrOrderNotFound
+		return order.ErrConcurrentUpdate
 	}
 	return nil
 }

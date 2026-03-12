@@ -40,12 +40,16 @@ make docker-down
 - Desenvolvimento com hot-reload (requer `air` instalado via `go tool`):
 
 ```bash
+make dev
+```
+
+- Executar a aplicação sem hot-reload:
+
+```bash
 make run
 ```
 
 ### Variáveis de ambiente
-
-As configurações são carregadas via `cleanenv` a partir do arquivo `.env`.
 
 | Variável                 | Obrigatória | Default      | Descrição                              |
 |--------------------------|------------|--------------|----------------------------------------|
@@ -65,13 +69,12 @@ As configurações são carregadas via `cleanenv` a partir do arquivo `.env`.
 
 ### Comandos principais (Makefile)
 
-- **Rodar em desenvolvimento (hot reload)**: `make run`
+- **Rodar em desenvolvimento (hot reload)**: `make dev`
 - **Build do binário**: `make build`
 - **Testes + cobertura (domínio, aplicação, adapters)**: `make test`
 - **Cobertura (resumo no terminal)**: `make coverage`
 - **Cobertura em HTML (`coverage.html`)**: `make coverage-html`
 - **Gerar documentação Swagger**: `make swagger`
-- **Lint**: `make lint`
 - **Subir stack com Docker Compose**: `make docker-up`
 - **Derrubar stack**: `make docker-down`
 
@@ -118,6 +121,40 @@ make coverage
 go tool cover -func=coverage.out
 ```
 
+  **Resultado da cobertura** (saída de `make coverage` — pacotes e resumo por função):
+
+  - Pacotes considerados na cobertura: `internal/domain/...`, `internal/application/...`, `internal/adapters/http/...`, `internal/adapters/mongodb/...`, `internal/adapters/rabbitmq/...`.
+  - Exemplo de saída no terminal (resumo por função e total):
+
+```
+order-service/internal/adapters/http/dto/request.go:21:		ToDomainItems		100.0%
+order-service/internal/adapters/http/dto/response.go:35:	FromDomain		100.0%
+order-service/internal/adapters/http/handler.go:20:		NewHandler		100.0%
+order-service/internal/adapters/http/handler.go:31:		Health			100.0%
+order-service/internal/adapters/http/handler.go:55:		CreateOrder		100.0%
+order-service/internal/adapters/http/handler.go:82:		GetOrder		100.0%
+order-service/internal/adapters/http/handler.go:109:		UpdateOrderStatus	93.8%
+order-service/internal/adapters/http/middleware.go:12:		RequestLogger		100.0%
+order-service/internal/adapters/http/middleware.go:35:		generateTraceID		100.0%
+order-service/internal/adapters/http/router.go:12:		NewRouter		100.0%
+order-service/internal/adapters/mongodb/order_repository.go:21:	NewOrderRepository	100.0%
+order-service/internal/adapters/mongodb/order_repository.go:27:	Create			83.3%
+order-service/internal/adapters/mongodb/order_repository.go:39:	GetByID			77.8%
+order-service/internal/adapters/mongodb/order_repository.go:56:	Update			70.0%
+order-service/internal/adapters/rabbitmq/publisher.go:24:	NewPublisher		45.0%
+order-service/internal/adapters/rabbitmq/publisher.go:83:	PublishStatusChanged	62.5%
+order-service/internal/adapters/rabbitmq/publisher.go:107:	Close			50.0%
+order-service/internal/application/order/service.go:34:		NewService		100.0%
+order-service/internal/application/order/service.go:41:		CreateOrder		100.0%
+order-service/internal/application/order/service.go:54:		GetOrderByID		100.0%
+order-service/internal/application/order/service.go:58:		UpdateOrderStatus	100.0%
+order-service/internal/domain/order/order.go:26:		NewOrder		100.0%
+order-service/internal/domain/order/order.go:62:		CanTransitionTo		100.0%
+order-service/internal/domain/order/order.go:70:		UpdateStatus		85.7%
+order-service/internal/domain/order/status.go:12:		IsValid			100.0%
+total:								(statements)		86.5%
+```
+
   - Gerar relatório HTML em `coverage.html` (meta ≥ 60%):
 
 ```bash
@@ -138,3 +175,4 @@ go tool cover -html=coverage.out -o coverage.html
 - **Configuração**: `cleanenv` lendo exclusivamente de `.env`, com validação de variáveis obrigatórias.
 - **Observabilidade**: logs estruturados com Zap, middleware adicionando `trace_id` e inclusão de `order_id` em operações críticas.
 - **Testes**: uso de `testify/mock` para mocks de ports, Dockertest para MongoDB/RabbitMQ e suite e2e exercendo o fluxo completo da API.
+ - **Concorrência em atualização de pedidos**: controle de concorrência **otimista** baseado em campo `version` no documento de pedido. A camada de domínio apenas valida e altera o status; o repositório MongoDB aplica `UpdateOne` com filtro em `(_id, version)` e operação atômica `"$inc": {"version": 1}`. Se nenhum documento for casado, o repositório retorna `ErrConcurrentUpdate`, que o handler HTTP mapeia para `HTTP 409 (Conflict)`, evitando atualizações perdidas quando múltiplas requisições tentam mudar o mesmo pedido simultaneamente.
