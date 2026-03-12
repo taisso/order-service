@@ -11,12 +11,10 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
-// MockOrderService implementa apporder.Service para testes de camada HTTP.
 type MockOrderService struct {
 	mock.Mock
 }
 
-// Garante em tempo de compilação que MockOrderService implementa ports.Service.
 var _ ports.Service = (*MockOrderService)(nil)
 
 func (m *MockOrderService) CreateOrder(
@@ -45,7 +43,6 @@ func (m *MockOrderService) UpdateOrderStatus(
 	return order, args.Error(1)
 }
 
-// MockMongoClient implementa mongoclient.Client para testes.
 type MockMongoClient struct {
 	mock.Mock
 }
@@ -63,4 +60,3 @@ func (m *MockMongoClient) Close(ctx context.Context) error {
 	args := m.Called(ctx)
 	return args.Error(0)
 }
-
