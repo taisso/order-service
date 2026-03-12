@@ -1,5 +1,5 @@
 @baseUrl = http://localhost:8080
-@orderId = REPLACE_WITH_ORDER_ID
+@orderId = {{createOrder.response.body.id}}
 
 ### Healthcheck
 GET {{baseUrl}}/health
@@ -7,6 +7,7 @@ Content-Type: application/json
 ###
 
 ### Criar pedido
+# @name createOrder
 POST {{baseUrl}}/orders
 Content-Type: application/json
 
@@ -33,12 +34,10 @@ Content-Type: application/json
     }
   ]
 }
-
 ###
 
 ### Buscar pedido por ID
-# Copie o campo "id" da resposta do POST acima
-# e substitua REPLACE_WITH_ORDER_ID na variável @orderId no topo.
+# Crie o pedido previamente para buscar pelo ID
 GET {{baseUrl}}/orders/{{orderId}}
 Accept: application/json
 
