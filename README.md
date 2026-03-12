@@ -127,17 +127,17 @@ go tool cover -func=coverage.out
 
   **Resultado da cobertura** (saída de `make coverage` — pacotes e resumo por função):
 
-  - Pacotes considerados na cobertura: `internal/domain/...`, `internal/application/...`, `internal/adapters/http/...`, `internal/adapters/mongodb/...`, `internal/adapters/rabbitmq/...`.
+  - Pacotes considerados na cobertura: `internal/domain/...`, `internal/application/...`, `internal/adapters/...`.
   - Exemplo de saída atual no terminal (resumo por função e total, via `make coverage`):
 
 ```
 order-service/internal/adapters/http/dto/request.go:21:		ToDomainItems		100.0%
 order-service/internal/adapters/http/dto/response.go:35:	FromDomain		100.0%
-order-service/internal/adapters/http/handler.go:20:		NewHandler		100.0%
-order-service/internal/adapters/http/handler.go:31:		Health			100.0%
-order-service/internal/adapters/http/handler.go:55:		CreateOrder		100.0%
-order-service/internal/adapters/http/handler.go:82:		GetOrder		100.0%
-order-service/internal/adapters/http/handler.go:109:		UpdateOrderStatus	94.1%
+order-service/internal/adapters/http/handler.go:21:		NewHandler		100.0%
+order-service/internal/adapters/http/handler.go:32:		Health			100.0%
+order-service/internal/adapters/http/handler.go:56:		CreateOrder		100.0%
+order-service/internal/adapters/http/handler.go:83:		GetOrder		100.0%
+order-service/internal/adapters/http/handler.go:110:		UpdateOrderStatus	100.0%
 order-service/internal/adapters/http/middleware.go:12:		RequestLogger		100.0%
 order-service/internal/adapters/http/middleware.go:35:		generateTraceID		100.0%
 order-service/internal/adapters/http/router.go:12:		NewRouter		100.0%
@@ -154,9 +154,9 @@ order-service/internal/application/order/service.go:42:		GetOrderByID		100.0%
 order-service/internal/application/order/service.go:46:		UpdateOrderStatus	100.0%
 order-service/internal/domain/order/order.go:27:		NewOrder		100.0%
 order-service/internal/domain/order/order.go:64:		CanTransitionTo		100.0%
-order-service/internal/domain/order/order.go:72:		UpdateStatus		85.7%
+order-service/internal/domain/order/order.go:72:		UpdateStatus		100.0%
 order-service/internal/domain/order/status.go:12:		IsValid			100.0%
-total:								(statements)		87.2%
+total:								(statements)		88.3%
 ```
 
   - Gerar relatório HTML em `coverage.html` (meta ≥ 60%):

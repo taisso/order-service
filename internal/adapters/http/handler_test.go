@@ -359,6 +359,30 @@ func TestHandler_UpdateOrderStatus_ErrInvalidStatusTransition(t *testing.T) {
 	svc.AssertExpectations(t)
 }
 
+func TestHandler_UpdateOrderStatus_ErrSameStatus(t *testing.T) {
+	svc := new(mocks.MockOrderService)
+	router := setupRouter(svc)
+
+	svc.
+		On("UpdateOrderStatus", mock.Anything, "id-1", domain.StatusProcessing).
+		Return((*domain.Order)(nil), domain.ErrSameStatus)
+
+	updateStatusRequest := dto.UpdateStatusRequest{
+		Status: "em_processamento",
+	}
+	body, err := json.Marshal(updateStatusRequest)
+	assert.NoError(t, err)
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodPatch, "/orders/id-1/status", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	svc.AssertExpectations(t)
+}
+
 func TestHandler_UpdateOrderStatus_OtherError(t *testing.T) {
 	svc := new(mocks.MockOrderService)
 	router := setupRouter(svc)

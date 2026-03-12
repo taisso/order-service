@@ -127,6 +127,22 @@ func TestUpdateStatus_SameStatusError(t *testing.T) {
 	assert.Equal(t, StatusCreated, o.Status)
 }
 
+func TestUpdateStatus_InvalidStatus(t *testing.T) {
+	now := time.Now()
+
+	o, err := NewOrder("customer-1", []OrderItem{
+		{ProductID: "p", ProductName: "n", Quantity: 1, UnitPrice: 10},
+	}, now)
+	assert.NoError(t, err)
+
+	// status inválido deve retornar ErrInvalidStatus e não alterar o estado
+	invalid := Status("invalido")
+	err = o.UpdateStatus(invalid, now)
+	assert.Error(t, err)
+	assert.Equal(t, ErrInvalidStatus, err)
+	assert.Equal(t, StatusCreated, o.Status)
+}
+
 func TestCanTransitionTo_AllBranches(t *testing.T) {
 	o := &Order{Status: StatusCreated}
 
