@@ -110,7 +110,7 @@ make test
   Ou, sem Make:
 
 ```bash
-go test ./... -coverpkg=./internal/domain/...,./internal/application/...,./internal/adapters/http/...,./internal/adapters/mongodb/...,./internal/adapters/rabbitmq/... -coverprofile=coverage.out
+go test ./... -coverpkg=./internal/domain/...,./internal/application/...,./internal/adapters/... -coverprofile=coverage.out
 ```
 
   - Ver resumo de cobertura por função no terminal:
