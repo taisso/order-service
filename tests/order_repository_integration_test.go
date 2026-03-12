@@ -149,6 +149,24 @@ func (s *OrderRepositoryIntegrationSuite) TestUpdateStatusConcurrentUpdate() {
 	s.Require().Equal(int32(len(status)-1), countConcurrentUpdates.Load())
 }
 
+func (s *OrderRepositoryIntegrationSuite) TestUpdate_InvalidID() {
+	ctx := context.TODO()
+
+	o := &domain.Order{}
+
+	err := s.repo.Update(ctx, o)
+	s.Require().Error(err)
+	s.Equal(domain.ErrInvalidOrder, err)
+}
+
+func (s *OrderRepositoryIntegrationSuite) TestGetByID_InvalidID() {
+	ctx := context.TODO()
+
+	_, err := s.repo.GetByID(ctx, "invalid-id")
+	s.Require().Error(err)
+	s.Equal(domain.ErrInvalidOrder, err)
+}
+
 func (s *OrderRepositoryIntegrationSuite) TestGetByID_NotFound() {
 	ctx := context.TODO()
 	_, err := s.repo.GetByID(ctx, "000000000000000000000000")
