@@ -87,7 +87,7 @@ make run
 - `GET /orders/:id` – consulta pedido por ID
 - `PATCH /orders/:id/status` – atualiza status do pedido (publica evento no RabbitMQ). Aceita qualquer transição entre os status válidos (`criado`, `em_processamento`, `enviado`, `entregue`), mas rejeita tentativas de atualizar para o mesmo status atual.
 - `GET /health` – healthcheck
-- `GET /swagger/index.html` – Swagger UI (após `make swagger` e app rodando)
+- `GET /swagger/index.html` – Swagger UI
 
 ### Testes e cobertura
 
